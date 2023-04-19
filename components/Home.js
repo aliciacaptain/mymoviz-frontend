@@ -39,7 +39,7 @@ function Home() {
   const API_KEY = process.env.API_KEY;
   const [moviesData, setMoviesData] = useState([]);
   useEffect(() => {
-    fetch("mymoviz-backend-lgqxmh347-aliciacaptain.vercel.app")
+    fetch("https://mymoviz-backend-lgqxmh347-aliciacaptain.vercel.app")
       .then((response) => response.json())
       .then((data) => {
         console.log(data.movies);
