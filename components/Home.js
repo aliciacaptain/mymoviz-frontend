@@ -8,6 +8,7 @@ import styles from "../styles/Home.module.css";
 
 function Home() {
   const [likedMovies, setLikedMovies] = useState([]);
+  const [moviesData, setMoviesData] = useState([]);
 
   // Liked movies (inverse data flow)
   const updateLikedMovies = (movieTitle) => {
@@ -36,34 +37,41 @@ function Home() {
   );
 
   // Movies list
-  const API_KEY = process.env.API_KEY;
-  const [moviesData, setMoviesData] = useState([]);
   useEffect(() => {
-    fetch("https://mymoviz-backend-five-gamma.vercel.app/movies")
+    fetch("http://localhost:3000/movies")
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.movies);
-        setMoviesData(data.movies);
+        const formatedData = data.movies.map((movie) => {
+          const poster = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
+          let overview = movie.overview;
+          if (overview.length > 250) {
+            overview = overview.substring(0, 250) + "...";
+          }
+
+          return {
+            title: movie.title,
+            poster,
+            voteAverage: movie.vote_average,
+            voteCount: movie.vote_count,
+            overview,
+          };
+        });
+        setMoviesData(formatedData);
       });
   }, []);
 
-  const movies = moviesData.map((movies, i) => {
-    console.log("movies title : ", movies.vote_average);
-    const isLiked = likedMovies.some((movie) => movie === movies.title);
+  const movies = moviesData.map((data, i) => {
+    const isLiked = likedMovies.some((movie) => movie === data.title);
     return (
       <Movie
         key={i}
         updateLikedMovies={updateLikedMovies}
         isLiked={isLiked}
-        title={movies.title}
-        overview={
-          movies.overview.length > 250
-            ? `${movies.overview.substring(0, 250)}...`
-            : movies.overview
-        }
-        poster={`https://image.tmdb.org/t/p/w500/${movies.poster_path}`}
-        voteAverage={movies.vote_average}
-        voteCount={movies.vote_count}
+        title={data.title}
+        overview={data.overview}
+        poster={data.poster}
+        voteAverage={data.voteAverage}
+        voteCount={data.voteCount}
       />
     );
   });
